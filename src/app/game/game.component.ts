@@ -1,5 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 
+import { AngularFireDatabase } from '@angular/fire/compat/database';
+
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
@@ -55,6 +57,12 @@ export class GameComponent implements OnInit {
 
   difficulty = 'medium';
 
+  constructor(private db: AngularFireDatabase) {}
+
+  updateScores(player1Score: number, player2Score: number) {
+    this.db.object('scores').set({ player1Score, player2Score });
+  }
+
   changeDifficulty() {
     if (this.difficulty === 'easy') {
       this.ballDX = this.ballDY = 2;
@@ -68,7 +76,16 @@ export class GameComponent implements OnInit {
   ngOnInit(): void {
     this.canvas = document.getElementById('pongCanvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
-    this.startGame();
+    // this.startGame();
+    this.db
+      .object<{ player1Score: number; player2Score: number }>('scores')
+      .valueChanges()
+      .subscribe((scores) => {
+        if (scores) {
+          this.player1Score = scores.player1Score || 0;
+          this.player2Score = scores.player2Score || 0;
+        }
+      });
   }
 
   startGame() {
@@ -182,6 +199,7 @@ export class GameComponent implements OnInit {
     } else if (this.ballX - this.ballRadius > this.canvas.width) {
       this.player1Score++;
     }
+    this.updateScores(this.player1Score, this.player2Score);
 
     this.checkForWin(); // Check for a winner
 
