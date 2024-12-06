@@ -1,0 +1,25 @@
+<div style="text-align: center; margin-bottom: 10px">
+  <h3>Player 1: {{ player1Score }} | Player 2: {{ player2Score }}</h3>
+  <p *ngIf="!isRunning">Game Status: Waiting to Start</p>
+  <p *ngIf="isRunning && !isPaused">Game Status: Running</p>
+  <p *ngIf="isPaused">Game Status: Paused</p>
+</div>
+<canvas id="pongCanvas" width="800" height="400"></canvas>
+<div style="text-align: center; margin-top: 100px">
+  <label for="difficulty">Difficulty:</label>
+  <select
+    id="difficulty"
+    [(ngModel)]="difficulty"
+    (change)="changeDifficulty()"
+  >
+    <option value="easy">Easy</option>
+    <option value="medium">Medium</option>
+    <option value="hard">Hard</option>
+  </select>
+</div>
+<div style="text-align: center; margin-top: 10px">
+  <button (click)="startGame()">Start/Restart</button>
+  <button (click)="pauseGame()" [disabled]="!isRunning">
+    {{ isPaused ? "Resume" : "Pause" }}
+  </button>
+</div>
